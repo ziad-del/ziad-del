@@ -1,0 +1,8 @@
+cmake_minimum_required(VERSION 2.4)
+project(snake)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/build")
+include_directories(${PROJECT_SOURCE_DIR})
+include_directories(${PROJECT_SOURCE_DIR}/include)
+find_package(SDL2 REQUIRED)
+add_executable(snake ./src/main.c ./src/logic.c ./src/draw.c)
+target_link_libraries( ${PROJECT_NAME} PRIVATE SDL2::SDL2 SDL2::SDL2main)
