@@ -7,37 +7,31 @@
 #endif
 #include "draw.h"
 
-int draw_game(void){
-    printf("Drawing the game \n");
-    return 0;
-}
-int init_game(SDL_Window * window){
-int ret=create_window(window);
-if (ret !=0){
-	return 1;
-}
-SDL_Delay(DELAY);
-destroy_windows(window);
-return 0;
-}
 
-int create_window(SDL_Window *window ){
-      window = SDL_CreateWindow("SDL Example", /* Title of the SDL window */
-			    SDL_WINDOWPOS_UNDEFINED, /* Position x of the window */
-			    SDL_WINDOWPOS_UNDEFINED, /* Position y of the window */
-			    WIDTH, /* Width of the window in pixels */
-			    HEIGHT, /* Height of the window in pixels */
-			    0); /* Additional flag(s) */
+int init_game(SDL_Window ** window , SDL_Renderer ** renderer  ){
 
-  if (window == NULL) {
+
+  *window = SDL_CreateWindow("SNAKE", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, SDL_WINDOW_SHOWN);
+  if (*window == NULL) {
     fprintf(stderr, "SDL window failed to initialise: %s\n", SDL_GetError());
     return 1;
   }
-  return 0;
+  
+  *renderer = SDL_CreateRenderer(*window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+  
+  if (*renderer == NULL) {
+    fprintf(stderr, "SDL renderer failed to initialise: %s\n", SDL_GetError());
+    return 1;
+  }
+
+return 0;
 }
 
 
-void destroy_windows(SDL_Window *window ){
-	SDL_DestroyWindow(window);
-  
+
+
+void destroy_game(SDL_Window **window,SDL_Renderer ** renderer ) {
+    SDL_DestroyRenderer(*renderer);
+    SDL_DestroyWindow(*window);
+    SDL_Quit();
 }

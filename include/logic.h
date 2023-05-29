@@ -5,5 +5,5 @@
 #else
 #include <SDL2/SDL.h> /* macOS- and GNU/Linux-specific */
 #endif
-int run_game_logic(void);
+int run_game_logic( SDL_Renderer** renderer );
 #endif
