@@ -6,6 +6,7 @@
 #include <SDL2/SDL.h> /* macOS- and GNU/Linux-specific */
 #endif
 #include "draw.h"
+#include <SDL2/SDL_image.h>
 
 
 int init_game(SDL_Window ** window, SDL_Renderer ** renderer){
@@ -41,6 +42,7 @@ int draw_game(SDL_Renderer ** renderer){
   SDL_SetRenderDrawColor(*renderer, 0, 0, 0, 255);
   SDL_RenderClear(*renderer);
   draw_random_food_on_table(renderer);
+  draw_img(renderer);
   SDL_RenderPresent(*renderer);
   return 0;
 }
@@ -50,4 +52,18 @@ void destroy_game(SDL_Window **window,SDL_Renderer ** renderer) {
     SDL_DestroyRenderer(*renderer);
     SDL_DestroyWindow(*window);
     SDL_Quit();
+}
+
+int draw_img(SDL_Renderer ** renderer){
+  SDL_Texture * image_texture = IMG_LoadTexture(*renderer,"./media/7.png");
+  int image_width, image_height;
+  SDL_QueryTexture(image_texture, NULL, NULL, &image_width, &image_height);
+  SDL_Rect texture_destination;
+  texture_destination.x = WIDTH*0.8;
+  texture_destination.y = 0;
+  texture_destination.w = image_width;
+  texture_destination.h = image_height;
+  SDL_RenderCopy(*renderer, image_texture, NULL, &texture_destination);
+  SDL_DestroyTexture(image_texture);
+  return 0;
 }

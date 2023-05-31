@@ -6,6 +6,7 @@
 #include <SDL2/SDL.h> /* macOS- and GNU/Linux-specific */
 #endif
 #include "draw.h"
+#include <SDL2/SDL_image.h> 
 int run_game_logic( SDL_Renderer** renderer ){
     int quit = 0;
     // Event handler
