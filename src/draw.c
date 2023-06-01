@@ -20,7 +20,6 @@ int init_game(SDL_Window ** window, SDL_Renderer ** renderer){
     fprintf(stderr, "SDL renderer failed to initialise: %s\n", SDL_GetError());
     return 1;
   }
-  draw_random_food_on_table(renderer);
 return 0;
 }
 
@@ -42,10 +41,14 @@ int draw_game(SDL_Renderer ** renderer){
   SDL_SetRenderDrawColor(*renderer, 0, 0, 0, 255);
   SDL_RenderClear(*renderer);
   draw_random_food_on_table(renderer);
-  draw_img(renderer);
+  show_score(552129993,renderer);
   SDL_RenderPresent(*renderer);
   return 0;
 }
+
+
+
+
 
 
 void destroy_game(SDL_Window **window,SDL_Renderer ** renderer) {
@@ -54,16 +57,33 @@ void destroy_game(SDL_Window **window,SDL_Renderer ** renderer) {
     SDL_Quit();
 }
 
-int draw_img(SDL_Renderer ** renderer){
-  SDL_Texture * image_texture = IMG_LoadTexture(*renderer,"./media/7.png");
+int draw_img(SDL_Renderer ** renderer,int number,int offset){
+  char filename[16];
+  sprintf(filename, "./media/%d.png", number);
+  SDL_Texture * image_texture = IMG_LoadTexture(*renderer,filename);
   int image_width, image_height;
   SDL_QueryTexture(image_texture, NULL, NULL, &image_width, &image_height);
   SDL_Rect texture_destination;
-  texture_destination.x = WIDTH*0.8;
+  texture_destination.x = WIDTH*0.95-30*offset;
   texture_destination.y = 0;
-  texture_destination.w = image_width;
-  texture_destination.h = image_height;
+  texture_destination.w = image_width*0.5;
+  texture_destination.h = image_height*0.5;
   SDL_RenderCopy(*renderer, image_texture, NULL, &texture_destination);
   SDL_DestroyTexture(image_texture);
   return 0;
+}
+
+
+int show_score(int score,SDL_Renderer ** renderer){
+    int r=0;
+    int e=score;
+    int offset=0;
+    do {
+    r=e%10;
+    e=e/10;
+    draw_img(renderer,r,offset);
+    offset+=1;
+    }
+while (e!=0);
+    return 0;
 }
