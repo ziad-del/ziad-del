@@ -14,6 +14,14 @@ int main (int argv, char ** argc)
   /* Initialises data */
   SDL_Window *window = NULL;
   SDL_Renderer* renderer = NULL;
+  snake serpent;
+
+  if (init_snake(&serpent) != 0){
+    return 1;
+  }
+  printf("size = %d \n",serpent.snake_size);
+  printf("direction = %d \n",serpent.snake_array[0].dir);
+
 
   if (SDL_Init(SDL_INIT_VIDEO) != 0) {
     fprintf(stderr, "SDL failed to initialise: %s\n", SDL_GetError());
@@ -30,8 +38,10 @@ int main (int argv, char ** argc)
     return 1;
   }
 
-  run_game_logic(&renderer);
+  
+  run_game_logic(&renderer,serpent);
   IMG_Quit();
   destroy_game(&window,&renderer);
+  free(serpent.snake_array);
   return 0;
 }

@@ -37,11 +37,50 @@ SDL_RenderDrawRect(*renderer, &box);
 SDL_RenderFillRect(*renderer, &box);
 }
 
-int draw_game(SDL_Renderer ** renderer){
+
+int init_snake(snake * s){
+  s->snake_size=2;
+  s->snake_array = (struct snake_element *) malloc(sizeof(struct snake_element)*s->snake_size);
+  if( s->snake_array == NULL){
+    printf("Failed to alloc memory \n");
+    return 1;
+  }  
+  snake_element head={0,WIDTH/2,HEIGHT/2,1};
+  snake_element tail={0,WIDTH/2,HEIGHT/2+STEP,0};
+  s->snake_array[0]=head;
+  s->snake_array[1]=tail;
+  return 0;
+}
+
+
+int draw_snake(snake s,SDL_Renderer ** renderer){
+SDL_Rect box;
+box.w = STEP; 
+box.h = STEP; 
+for(int i=0;i<s.snake_size;i++){
+ box.x = s.snake_array[i].posx;
+ box.y = s.snake_array[i].posy;
+ if (s.snake_array[i].is_head){
+ SDL_SetRenderDrawColor(*renderer, 0 , 0 , 255, 255);
+ }
+ else{
+  SDL_SetRenderDrawColor(*renderer, 0 , 255 , 0, 255);
+ }
+ 
+ SDL_RenderDrawRect(*renderer, &box);
+ SDL_RenderFillRect(*renderer, &box);
+}
+return 0;
+}
+
+
+
+int draw_game(SDL_Renderer ** renderer,snake s){
   SDL_SetRenderDrawColor(*renderer, 0, 0, 0, 255);
   SDL_RenderClear(*renderer);
   draw_random_food_on_table(renderer);
   show_score(552129993,renderer);
+  draw_snake(s,renderer);
   SDL_RenderPresent(*renderer);
   return 0;
 }

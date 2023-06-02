@@ -7,7 +7,7 @@
 #endif
 #include "draw.h"
 #include <SDL2/SDL_image.h> 
-int run_game_logic( SDL_Renderer** renderer ){
+int run_game_logic( SDL_Renderer** renderer , snake s){
     int quit = 0;
     // Event handler
     SDL_Event event;
@@ -15,7 +15,7 @@ int run_game_logic( SDL_Renderer** renderer ){
     while (!quit) {
         // Handle events on queue
         SDL_Delay(500);
-        draw_game(renderer);
+        draw_game(renderer,s);
         while (SDL_PollEvent(&event) != 0) {
             // Quit event (e.g., window close button)
             if (event.type == SDL_QUIT) {
