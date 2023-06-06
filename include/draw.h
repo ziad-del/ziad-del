@@ -16,6 +16,13 @@ typedef struct snake_element
     
 }snake_element; 
 
+enum dir {
+    UP,
+    DOWN,
+    LEFT,
+    RIGHT
+};
+
 
 typedef struct snake{
     int snake_size;
@@ -31,6 +38,7 @@ int show_score(int score,SDL_Renderer ** renderer);
 int draw_snake(snake s,SDL_Renderer ** renderer);
 #define WIDTH 800
 #define HEIGHT 600
-#define STEP 30
+#define STEP 40
+int move_snake(snake * s);
 int init_snake(snake * s);
 #endif

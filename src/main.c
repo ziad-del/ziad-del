@@ -39,7 +39,7 @@ int main (int argv, char ** argc)
   }
 
   
-  run_game_logic(&renderer,serpent);
+  run_game_logic(&renderer,&serpent);
   IMG_Quit();
   destroy_game(&window,&renderer);
   free(serpent.snake_array);

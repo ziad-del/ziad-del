@@ -28,8 +28,8 @@ SDL_Rect box;
 int random_number_WIDTH = rand() % WIDTH*0.95  + 10;
 int random_number_HEIGHT = rand() % HEIGHT*0.95 + 10;
 
-box.w = 15; 
-box.h = 15; 
+box.w = 10; 
+box.h = 10; 
 box.x = random_number_WIDTH;
 box.y = random_number_HEIGHT; 
 SDL_SetRenderDrawColor(*renderer, 255 , 0 , 0, 255);
@@ -39,24 +39,27 @@ SDL_RenderFillRect(*renderer, &box);
 
 
 int init_snake(snake * s){
-  s->snake_size=2;
+  s->snake_size=3;
   s->snake_array = (struct snake_element *) malloc(sizeof(struct snake_element)*s->snake_size);
   if( s->snake_array == NULL){
     printf("Failed to alloc memory \n");
     return 1;
   }  
-  snake_element head={0,WIDTH/2,HEIGHT/2,1};
-  snake_element tail={0,WIDTH/2,HEIGHT/2+STEP,0};
+  snake_element head={2,WIDTH/2,HEIGHT/2,1};
+  snake_element tail={0,WIDTH/2,HEIGHT/2+STEP/2,0};
+  snake_element third={0,WIDTH/2,HEIGHT/2+STEP,0};
+
   s->snake_array[0]=head;
   s->snake_array[1]=tail;
+  s->snake_array[2]=third;
   return 0;
 }
 
 
 int draw_snake(snake s,SDL_Renderer ** renderer){
 SDL_Rect box;
-box.w = STEP; 
-box.h = STEP; 
+box.w = 20; 
+box.h = 20; 
 for(int i=0;i<s.snake_size;i++){
  box.x = s.snake_array[i].posx;
  box.y = s.snake_array[i].posy;
@@ -86,7 +89,41 @@ int draw_game(SDL_Renderer ** renderer,snake s){
 }
 
 
+int move_snake(snake * s){
+   // the body follows the head  we update the body first
+    for (int i=s->snake_size-1 ;i >= 1 ;i--){
+     s->snake_array[i].posx=s->snake_array[i-1].posx; 
+     s->snake_array[i].posy=s->snake_array[i-1].posy; 
+    }
 
+  switch (s->snake_array[0].dir)
+  {
+  case UP:
+    s->snake_array[0].posy+=20 ;
+    s->snake_array[0].posy=s->snake_array[0].posy %HEIGHT;
+    break;
+  case DOWN:
+    s->snake_array[0].posy+=-20;
+    break;
+  case LEFT:
+      s->snake_array[0].posx+=-20;
+      s->snake_array[0].posx=s->snake_array[0].posx %WIDTH;
+    break;
+  case RIGHT:      s->snake_array[0].posx+= 20;
+      s->snake_array[0].posx=s->snake_array[0].posx %WIDTH;
+    break;
+
+  default:
+    break;
+  }
+   if(s->snake_array[0].posx < 0){
+       s->snake_array[0].posx = WIDTH;
+   }
+  if(s->snake_array[0].posy < 0){
+       s->snake_array[0].posy = HEIGHT;
+   }
+  return 0;
+} 
 
 
 

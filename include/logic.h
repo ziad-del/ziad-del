@@ -6,5 +6,5 @@
 #include <SDL2/SDL.h> /* macOS- and GNU/Linux-specific */
 #endif
 #include "draw.h"
-int run_game_logic( SDL_Renderer** renderer , snake s);
+int run_game_logic( SDL_Renderer** renderer , snake *s);
 #endif
