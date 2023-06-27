@@ -17,8 +17,8 @@ typedef struct snake_element
 }snake_element; 
 
 enum dir {
-    UP,
     DOWN,
+    UP,
     LEFT,
     RIGHT
 };

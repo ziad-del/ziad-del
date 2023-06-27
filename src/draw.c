@@ -98,11 +98,11 @@ int move_snake(snake * s){
 
   switch (s->snake_array[0].dir)
   {
-  case UP:
+  case DOWN:
     s->snake_array[0].posy+=20 ;
     s->snake_array[0].posy=s->snake_array[0].posy %HEIGHT;
     break;
-  case DOWN:
+  case UP:
     s->snake_array[0].posy+=-20;
     break;
   case LEFT:

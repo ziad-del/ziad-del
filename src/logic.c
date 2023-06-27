@@ -11,20 +11,44 @@ int run_game_logic( SDL_Renderer** renderer , snake * s){
     int quit = 0;
     // Event handler
     SDL_Event event;
-    // While application is running
     while (!quit) {
-        // Handle events on queue
-        SDL_Delay(500);
+        SDL_Delay(100);
         draw_game(renderer,*s);
         move_snake(s);
         while (SDL_PollEvent(&event) != 0) {
-            // Quit event (e.g., window close button)
-            if (event.type == SDL_QUIT) {
-                quit = 1;
+
+            switch (event.type){
+                case SDL_QUIT:
+                    quit = 1;
+                    break;
+
+                case SDL_KEYDOWN:   
+                     switch( event.key.keysym.sym ) {
+                        case SDLK_DOWN:
+                            s->snake_array[0].dir=DOWN;
+                             break;
+                        case SDLK_UP:
+                            s->snake_array[0].dir=UP;
+                             break;
+
+                        case SDLK_RIGHT:
+                            s->snake_array[0].dir=RIGHT;
+                            break;
+                        case SDLK_LEFT:
+                             s->snake_array[0].dir=LEFT;
+                             break;
+                        default:
+                            break;
+                     }
+                default:
+                    break; 
             }
-        }
-        // SDL_RenderClear(*renderer);
-        // SDL_RenderPresent(*renderer);
+            // Quit event (e.g., window close button)
+
+            
+
     }
+}
    return 0;
+
 }
