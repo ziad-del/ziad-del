@@ -7,4 +7,5 @@
 #endif
 #include "draw.h"
 int run_game_logic( SDL_Renderer** renderer , snake *s);
+int increase_snake_size(snake * s);
 #endif
