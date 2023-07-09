@@ -1,146 +1,84 @@
-#include <stdlib.h>
 #include <stdio.h>
+#include <stddef.h>  
+#include <stdbool.h>
 #ifdef _WIN32
 #include <SDL/SDL.h> /* Windows-specific SDL2 library */
+#include <SDL/SDL_image.h>
 #else
 #include <SDL2/SDL.h> /* macOS- and GNU/Linux-specific */
-#endif
-#include "draw.h"
 #include <SDL2/SDL_image.h>
+#endif
+#include <assert.h>  // assert
+#define unreachable assert(false);exit(99);
+#include "game.h"
+#include "update.h"
 
-
-int init_game(SDL_Window ** window, SDL_Renderer ** renderer){
-  *window = SDL_CreateWindow("SNAKE", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, SDL_WINDOW_SHOWN);
+int init_game(SDL_Window ** window, SDL_Renderer ** renderer,Game * game){
+  int ret=init_game_struct(game);
+  if (ret == EXIT_FAILURE) {
+    fprintf(stderr,"Failed to allocated memory");
+    return EXIT_FAILURE;
+  }
+  *window = SDL_CreateWindow("SNAKE", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, L, H, SDL_WINDOW_SHOWN);
   if (*window == NULL) {
     fprintf(stderr, "SDL window failed to initialise: %s\n", SDL_GetError());
-    return 1;
+    return EXIT_FAILURE;
   }
   *renderer = SDL_CreateRenderer(*window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
   if (*renderer == NULL) {
     fprintf(stderr, "SDL renderer failed to initialise: %s\n", SDL_GetError());
-    return 1;
+    return EXIT_FAILURE;
   }
-return 0;
+return EXIT_SUCCESS;
 }
 
-void draw_random_food_on_table(SDL_Renderer ** renderer){
-SDL_Rect box;
-int random_number_WIDTH = rand() % WIDTH*0.95  + 10;
-int random_number_HEIGHT = rand() % HEIGHT*0.95 + 10;
 
-box.w = 10; 
-box.h = 10; 
-box.x = random_number_WIDTH;
-box.y = random_number_HEIGHT; 
+void draw_grid(SDL_Renderer ** renderer){
+SDL_SetRenderDrawColor(*renderer, 128, 128, 128, 1);
+int x= 0;
+
+while (x <= H){
+   SDL_RenderDrawLine(*renderer, x, 0, x, L);
+   SDL_RenderDrawLine(*renderer, 0, x, L, x);
+
+   x+=STEP;
+}
+
+}
+void draw_snake(Game * game, SDL_Renderer ** renderer){
+
+for (int i=0; i < game->snake.snake_size; i++){
+SDL_Rect box;
+box.w = STEP; 
+box.h = STEP; 
 SDL_SetRenderDrawColor(*renderer, 255 , 0 , 0, 255);
+box.x = game->snake.firstp[i].x;
+box.y = game->snake.firstp[i].y;
+SDL_RenderDrawRect(*renderer, &box);
+SDL_RenderFillRect(*renderer, &box);
+
+}
+
+}
+int draw_food(Game * game,SDL_Renderer ** renderer){
+SDL_Rect box;
+box.w = STEP; 
+box.h = STEP; 
+SDL_SetRenderDrawColor(*renderer, 0 , 255 , 0, 255);
+box.x = game->food.x;
+box.y = game->food.y;
 SDL_RenderDrawRect(*renderer, &box);
 SDL_RenderFillRect(*renderer, &box);
 }
 
-
-int init_snake(snake * s){
-  s->snake_size=3;
-  s->snake_array = (struct snake_element *) malloc(sizeof(struct snake_element)*s->snake_size);
-  if( s->snake_array == NULL){
-    printf("Failed to alloc memory \n");
-    return 1;
-  }  
-  snake_element head={2,WIDTH/2,HEIGHT/2,1};
-  snake_element tail={0,WIDTH/2,HEIGHT/2+STEP/2,0};
-  snake_element third={0,WIDTH/2,HEIGHT/2+STEP,0};
-
-  s->snake_array[0]=head;
-  s->snake_array[1]=tail;
-  s->snake_array[2]=third;
-  return 0;
-}
-
-
-int draw_snake(snake s,SDL_Renderer ** renderer){
-SDL_Rect box;
-box.w = 20; 
-box.h = 20; 
-for(int i=0;i<s.snake_size;i++){
- box.x = s.snake_array[i].posx;
- box.y = s.snake_array[i].posy;
- if (s.snake_array[i].is_head){
- SDL_SetRenderDrawColor(*renderer, 0 , 0 , 255, 255);
- }
- else{
-  SDL_SetRenderDrawColor(*renderer, 0 , 255 , 0, 255);
- }
- 
- SDL_RenderDrawRect(*renderer, &box);
- SDL_RenderFillRect(*renderer, &box);
-}
-return 0;
-}
-
-
-
-int draw_game(SDL_Renderer ** renderer,snake s){
-  SDL_SetRenderDrawColor(*renderer, 0, 0, 0, 255);
-  SDL_RenderClear(*renderer);
-  draw_random_food_on_table(renderer);
-  show_score(552129993,renderer);
-  draw_snake(s,renderer);
-  SDL_RenderPresent(*renderer);
-  return 0;
-}
-
-
-int move_snake(snake * s){
-   // the body follows the head  we update the body first
-    for (int i=s->snake_size-1 ;i >= 1 ;i--){
-     s->snake_array[i].posx=s->snake_array[i-1].posx; 
-     s->snake_array[i].posy=s->snake_array[i-1].posy; 
-    }
-
-  switch (s->snake_array[0].dir)
-  {
-  case DOWN:
-    s->snake_array[0].posy+=20 ;
-    s->snake_array[0].posy=s->snake_array[0].posy %HEIGHT;
-    break;
-  case UP:
-    s->snake_array[0].posy+=-20;
-    break;
-  case LEFT:
-      s->snake_array[0].posx+=-20;
-      s->snake_array[0].posx=s->snake_array[0].posx %WIDTH;
-    break;
-  case RIGHT:      s->snake_array[0].posx+= 20;
-      s->snake_array[0].posx=s->snake_array[0].posx %WIDTH;
-    break;
-
-  default:
-    break;
-  }
-   if(s->snake_array[0].posx < 0){
-       s->snake_array[0].posx = WIDTH;
-   }
-  if(s->snake_array[0].posy < 0){
-       s->snake_array[0].posy = HEIGHT;
-   }
-  return 0;
-} 
-
-
-
-void destroy_game(SDL_Window **window,SDL_Renderer ** renderer) {
-    SDL_DestroyRenderer(*renderer);
-    SDL_DestroyWindow(*window);
-    SDL_Quit();
-}
-
-int draw_img(SDL_Renderer ** renderer,int number,int offset){
+int draw_score(SDL_Renderer ** renderer,int number,int offset){
   char filename[16];
   sprintf(filename, "./media/%d.png", number);
   SDL_Texture * image_texture = IMG_LoadTexture(*renderer,filename);
   int image_width, image_height;
   SDL_QueryTexture(image_texture, NULL, NULL, &image_width, &image_height);
   SDL_Rect texture_destination;
-  texture_destination.x = WIDTH*0.95-30*offset;
+  texture_destination.x = L*0.95-30*offset;
   texture_destination.y = 0;
   texture_destination.w = image_width*0.5;
   texture_destination.h = image_height*0.5;
@@ -149,7 +87,6 @@ int draw_img(SDL_Renderer ** renderer,int number,int offset){
   return 0;
 }
 
-
 int show_score(int score,SDL_Renderer ** renderer){
     int r=0;
     int e=score;
@@ -157,9 +94,22 @@ int show_score(int score,SDL_Renderer ** renderer){
     do {
     r=e%10;
     e=e/10;
-    draw_img(renderer,r,offset);
+    draw_score(renderer,r,offset);
     offset+=1;
     }
 while (e!=0);
     return 0;
+}
+
+void draw(Game * game,SDL_Renderer ** renderer){
+// clear screen content
+SDL_SetRenderDrawColor(*renderer, 0, 0, 0, 255);
+SDL_RenderClear(*renderer);
+
+draw_grid(renderer);
+draw_snake(game,  renderer);
+// draw buffer
+draw_food(game,renderer);
+show_score(game->score,renderer);
+SDL_RenderPresent(*renderer);
 }
